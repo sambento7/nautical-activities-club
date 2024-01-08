@@ -2,28 +2,19 @@ import * as React from 'react';
 import { GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 import { Edit, Delete } from '@mui/icons-material';
 import Avatar from '@mui/material/Avatar';
-import { GridToolbar } from '@mui/x-data-grid';
-import IconButton from '@mui/material/IconButton';
-
-import {StyledDataGridContainer, StyledDataGrid, StyledToolBar} from './styles.ts'
-
-const renderEditButton = (params) => (
-  <IconButton>
-    <Edit style={{ color: 'blue' }} />
-  </IconButton>
-);
+import { Table } from '../../components/Table/index.tsx';
 
 const columns: GridColDef[] = [
-  { field: 'id', headerName: 'ID', width: 90 },
-  { field: 'firstName', headerName: 'First name', width: 130, filterable: true },
-  { field: 'lastName', headerName: 'Last name', width: 130, filterable: true },
-  { field: 'birthdate', headerName: 'Birthdate', width: 130, filterable: true },
-  { field: 'fiscalNumber', headerName: 'Fiscal Number', width: 130, filterable: true },
-  { field: 'mobileNumber', headerName: 'Mobile Number', width: 130, filterable: true },
+  { field: 'id', headerName: 'ID', width: 160 },
+  { field: 'firstName', headerName: 'First name', width: 200, filterable: true },
+  { field: 'lastName', headerName: 'Last name', width: 200, filterable: true },
+  { field: 'birthdate', headerName: 'Birthdate', width: 200, filterable: true },
+  { field: 'fiscalNumber', headerName: 'Fiscal Number', width: 200, filterable: true },
+  { field: 'mobileNumber', headerName: 'Mobile Number', width: 200, filterable: true },
   {
     field: 'photo',
     headerName: 'Photo',
-    width: 90,
+    width: 160,
     renderCell: (params) => (
       <Avatar alt={params.row.firstName} src={params.row.photoUrl} />
     ),
@@ -32,11 +23,11 @@ const columns: GridColDef[] = [
   {
     field: 'actions',
     headerName: 'Action',
-    width: 130,
+    width: 200,
     renderCell: (params) => (
       <>
-        <GridActionsCellItem icon={<Edit />} label="Edit" />
-        <GridActionsCellItem icon={<Delete />} label="Delete" />
+        <GridActionsCellItem icon={<Edit color={'action'}/>} label="Edit" />
+        <GridActionsCellItem icon={<Delete color={'error'}/>} label="Delete" />
       </>
     ),
     filterable: false
@@ -76,30 +67,6 @@ const rows = [
 
 export const Customers: React.FC = () => {
   return (
-    <StyledDataGridContainer>
-      <StyledDataGrid
-        rows={rows}
-        columns={columns}
-        slots={{
-          toolbar: GridToolbar,
-        }}
-        pageSizeOptions={[5, 10]}
-        checkboxSelection
-        disableRowSelectionOnClick
-        initialState={{
-          pagination: {
-            paginationModel: { page: 0, pageSize: 5 },
-          },
-          // filter: {
-          //   filterModel: {
-          //     items: [
-          //       // se quiser filtrar logo de início
-          //       // { columnField: 'firstName', operatorValue: 'contains', value: 'a' },
-          //     ],
-          //   },
-          // },
-        }}
-      />
-    </StyledDataGridContainer>
+    <Table rows={rows} columns={columns}/>
   );
 };

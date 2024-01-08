@@ -5,6 +5,8 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 
 import {StyledButton, StyledCardItem, StyledGrid, CustomSubTitle, CustomText, CustomTitle, Identifier, InfoLine} from './styles.ts';
+import { Link } from 'react-router-dom';
+
 
 export function Schedules() {
   const scheduleItems = [
@@ -45,7 +47,8 @@ export function Schedules() {
                     </CardActions>
                 </StyledCardItem>
                 ))}
-                <StyledButton variant="contained">See all</StyledButton>
+
+                <Link to="/scheduling"><StyledButton variant="contained">See all</StyledButton></Link>
         </Grid>
     </StyledGrid>
     

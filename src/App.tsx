@@ -24,8 +24,8 @@ function App() {
   // const dispatch = useDispatch()
   return (
     <>
-      <Header/>
       <StyledBackground>
+        <Header/>
       {/* <div>
         <h1>Counter {counter}</h1>
         <button onClick={() => dispatch(increment(5))}>+</button>
