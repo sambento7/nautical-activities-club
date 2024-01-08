@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
+import Button from '@mui/material/Button';
 
 export const StyledGrid = styled(Grid)`
   background: #ECECEC;
@@ -8,10 +9,12 @@ export const StyledGrid = styled(Grid)`
   border-radius: 20px; 
 `;
 
-export const StyledCardItem = styled(Card)`
-  background: #f5f5f5;
-  border-radius: 30px; 
-  filter: drop-shadow(0px 5px 11.3pxs rgba(0, 0, 0, 0.25));
+export const StyledCardItem = styled(Card)` //uso && para garantir que este estilo tem precedência sobre outros estilos
+  && {
+    background: #f5f5f5;
+    border-radius: 20px; 
+    box-shadow: 0px 5px 11.3px rgba(0, 0, 0, 0.25); 
+    } 
 `;
 
 export const CustomTitle = styled.h2`
@@ -45,4 +48,17 @@ export const CustomText = styled.p`
   color: #718096;
   margin: 0; 
 `;
+
+export const StyledButton = styled(Button)`
+  &&{
+    background: #F8F9FA;
+    box-shadow: 0px 8px 5.8px rgba(0, 0, 0, 0.25);
+    border-radius: 12px;
+    color: #2D3748;
+    width: 136px;
+    height: 22px;
+    font-weight: 700;
+  }
+`;
+
 

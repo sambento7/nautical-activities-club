@@ -1,11 +1,10 @@
 import React from 'react';
-import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 
-import {StyledCardItem, StyledGrid, CustomSubTitle, CustomText, CustomTitle, Identifier, InfoLine} from './styles.ts';
+import {StyledButton, StyledCardItem, StyledGrid, CustomSubTitle, CustomText, CustomTitle, Identifier, InfoLine} from './styles.ts';
 
 export function Schedules() {
   const scheduleItems = [
@@ -46,7 +45,7 @@ export function Schedules() {
                     </CardActions>
                 </StyledCardItem>
                 ))}
-                <Button variant="outlined">See all</Button>
+                <StyledButton variant="contained">See all</StyledButton>
         </Grid>
     </StyledGrid>
     

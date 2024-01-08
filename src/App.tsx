@@ -11,7 +11,7 @@ import {Activities} from './pages/Activities/index.tsx'
 import {Scheduling} from './pages/Scheduling/index.tsx'
 
 import {Header} from './components/Header/index.tsx'
-
+import StyledBackground from './components/Background/index.tsx'
 // interface RootState {
 //   counter: number;
 //   isLogged: boolean;
@@ -25,18 +25,20 @@ function App() {
   return (
     <>
       <Header/>
+      <StyledBackground>
       {/* <div>
         <h1>Counter {counter}</h1>
         <button onClick={() => dispatch(increment(5))}>+</button>
         <button onClick={() => dispatch(decrement())}>-</button>
         {isLogged && <h3>Valuable information i shouldn´t see</h3>}
       </div> */}
-      <Routes>
-        <Route path="/" element={<Dashboard/>}/>
-        <Route path="/customers" element={<Customers/>}/>
-        <Route path="/activities" element={<Activities/>}/>
-        <Route path="/scheduling" element={<Scheduling/>}/>
-      </Routes>
+        <Routes>
+          <Route path="/" element={<Dashboard/>}/>
+          <Route path="/customers" element={<Customers/>}/>
+          <Route path="/activities" element={<Activities/>}/>
+          <Route path="/scheduling" element={<Scheduling/>}/>
+        </Routes>
+      </StyledBackground>
     </>
   );
 }
