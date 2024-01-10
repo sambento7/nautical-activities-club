@@ -11,7 +11,7 @@ export function ImageCarousel() {
     const kayak = "https://www.clcboats.com/images/photos/gales2013/1-autumngales2013_play-in-tidalrace6.jpg";
 
     return (
-        <StyledCarousel>
+        <StyledCarousel showThumbs={false}>
             <div>
                 <ActivityImage src={surfYoga} alt="surfYoga"/>
             </div>

@@ -4,4 +4,5 @@ import { Carousel } from 'react-responsive-carousel';
 
 export const StyledCarousel = styled(Carousel)`
     /* width: 100%; */
+    margin-bottom: 50px;
 `;
