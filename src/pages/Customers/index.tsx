@@ -3,8 +3,8 @@ import { GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 import { Edit, Delete } from '@mui/icons-material';
 import Avatar from '@mui/material/Avatar';
 import { Table } from '../../components/Table/index.tsx';
-
 import { useAppSelector } from '../../store/store.ts'
+import { DeleteIcon } from '../../components/DeleteIcon/index.tsx';
 
 const columns: GridColDef[] = [
   { field: 'id', headerName: 'ID', width: 160 },
@@ -17,21 +17,22 @@ const columns: GridColDef[] = [
     field: 'photo',
     headerName: 'Photo',
     width: 160,
-    renderCell: (params) => (
-      <Avatar alt={params.row.firstName} src={params.row.photoUrl} />
-    ),
+    renderCell: (params) => {
+      
+      return <Avatar alt={params.row.firstName} src={params.row.photoUrl} />
+  },
     filterable: false
   },
   {
     field: 'actions',
     headerName: 'Action',
     width: 200,
-    renderCell: (params) => (
-      <>
+    renderCell: (params) => {
+      return (<>
         <GridActionsCellItem icon={<Edit color={'action'}/>} label="Edit" />
-        <GridActionsCellItem icon={<Delete color={'error'}/>} label="Delete" />
-      </>
-    ),
+        <GridActionsCellItem icon={<DeleteIcon color={'error'} id={params.row.id}/>} label="Delete" />
+      </>)
+    },
     filterable: false
   },
 
@@ -72,6 +73,6 @@ export const Customers: React.FC = () => {
   const customers = useAppSelector((state) => state.customer.customers);
 
   return (
-    <Table rows={customers} columns={columns}/>
+    <Table />
   );
 };

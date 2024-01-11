@@ -14,7 +14,7 @@ export interface sendCustomer{
     firstName: string;
     lastName: string;
     birthdate: string;
-    fiscalNumber: number;
+    fiscalNumber: string;
     mobileNumber: string;
 }
 
@@ -37,6 +37,12 @@ export const fetchCustomer = createAsyncThunk("customer/fetch", async (thunkAPI)
 });
 
 export const saveCustomer = createAsyncThunk("customer/save", async (customer: sendCustomer, thunkAPI)=>{
+
+    // const finalCustomer = {
+    //     ...customer,
+    //     fiscalNumber: parseInt(customer.fiscalNumber, 10)
+    // }
+
     const response = await fetch("http://localhost:8080/customer",{
         method: "POST",
         body: JSON.stringify(customer),
@@ -45,7 +51,33 @@ export const saveCustomer = createAsyncThunk("customer/save", async (customer: s
         },
     });
     const data = await response.json();
+    // console.log(data.body)
     return data;
+});
+
+export const deleteCustomer = createAsyncThunk("customer/delete", async (id: string, thunkAPI)=>{
+    const response = await fetch("http://localhost:8080/customer/" + id,{
+        method: "DELETE"
+    });
+    const data = await response.json();//VER FORMA MELHOR
+    // console.log(data)
+    return data;
+
+});
+
+export const updateCustomer = createAsyncThunk("customer/update", async (customer: Customer, thunkAPI)=>{
+    console.log(customer)
+    const response = await fetch("http://localhost:8080/customer/" + customer.id,{
+        method: "PUT",
+        body: JSON.stringify(customer),
+        headers: {
+            "Content-type": "application/json",
+        },
+    });
+    const data = await response.json();//VER FORMA MELHOR
+    // console.log(data)
+    return data;
+
 });
 
 export const CustomerSlice = createSlice({
@@ -61,12 +93,20 @@ export const CustomerSlice = createSlice({
     },
     extraReducers(builder) {
         builder.addCase(fetchCustomer.fulfilled, (state, action) => {
-            console.log(action.payload)
+            // console.log(action.payload)
             state.customers = action.payload;
         });
 
         builder.addCase(saveCustomer.fulfilled, (state, action) => {
             state.customers.push(action.payload);
+        });
+
+        // builder.addCase(saveCustomer.rejected, (state, action) => {
+        //     console.log(action.error)
+        // });
+
+        builder.addCase(deleteCustomer.fulfilled, (state, action) => {
+            fetchCustomer();
         });
     },
 });

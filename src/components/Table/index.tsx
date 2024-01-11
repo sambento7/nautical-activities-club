@@ -1,62 +1,112 @@
 import * as React from 'react';
-import { GridColDef} from '@mui/x-data-grid';
-import { GridToolbar } from '@mui/x-data-grid';
+import { GridColDef, GridToolbar} from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import {StyledDataGridContainer, StyledDataGrid} from './styles.ts'
-import { useRef, useState } from 'react';
+import { useState } from 'react';
+import { FormDialog } from './components/FormDialog/index.tsx';
 
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import TextField from '@mui/material/TextField';
-import CloseIcon from "@mui/icons-material/Close"
-import { IconButton, Stack } from '@mui/material';
+import {  GridActionsCellItem } from '@mui/x-data-grid';
+import { Edit} from '@mui/icons-material';
+import Avatar from '@mui/material/Avatar';
+import { DeleteIcon } from '../../components/DeleteIcon/index.tsx';
+import { useAppSelector } from '../../store/store.ts'
 
-import { useAppDispatch } from '../../store/store.ts'
-import { saveCustomer } from '../../store/features/customerSlice.ts';
+export const Table = () => {
 
-export const Table: React.FC<{rows: any[], columns: GridColDef[]}> = ({rows, columns}) => {
+  const columns: GridColDef[] = [
+    { field: 'id', headerName: 'ID', width: 160 },
+    { field: 'firstName', headerName: 'First name', width: 200, filterable: true },
+    { field: 'lastName', headerName: 'Last name', width: 200, filterable: true },
+    { field: 'birthdate', headerName: 'Birthdate', width: 200, filterable: true },
+    { field: 'fiscalNumber', headerName: 'Fiscal Number', width: 200, filterable: true },
+    { field: 'mobileNumber', headerName: 'Mobile Number', width: 200, filterable: true },
+    {
+      field: 'photo',
+      headerName: 'Photo',
+      width: 160,
+      renderCell: (params) => {
+        
+        return <Avatar alt={params.row.firstName} src={params.row.photoUrl} />
+    },
+      filterable: false
+    },
+    {
+      field: 'actions',
+      headerName: 'Action',
+      width: 200,
+      renderCell: (params) => {
+        return (<>
+          <GridActionsCellItem icon={<Edit color={'action'} 
+          onClick={() => handleClickEdit(params.row.firstName, params.row.lastName, params.row.birthdate, params.row.fiscalNumber, params.row.mobileNumber, params.row.id )}/>} 
+            label="Edit" />
+          <GridActionsCellItem icon={<DeleteIcon color={'error'} id={params.row.id}/>} label="Delete" />
+        </>)
+      },
+      filterable: false
+    },
+  
+  ];
 
-  const firstName = useRef<string>("");
-  const lastName = useRef<string>("");
-  const birthdate = useRef<string>("");
-  const fiscalNumber = useRef<number>(0);
-  const mobileNumber = useRef<string>("");
-  const dispatch = useAppDispatch();
+  const customers = useAppSelector((state) => state.customer.customers);
+
+  const [formData, setFormData] = useState({id: "", firstName: "", lastName: "", birthdate: "", fiscalNumber: "", mobileNumber: ""});
 
   const [open, setOpen] = useState(false);
+  
+  const [edit, setEdit] = useState(false);
 
-  const handleClickOpen = () => {
+  const handleClickOpenForm = () => {
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleCloseForm = () => {
+    setEdit(false);
     setOpen(false);
+    resetFormData();
   };
 
-  const FormDialog = () => (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-      <DialogTitle>Add New Customer <IconButton onClick={handleClose} style={{float:'right'}}><CloseIcon color="primary"></CloseIcon></IconButton></DialogTitle>
-      <DialogContent>
-         <Stack spacing={2} margin={2}>
-          <TextField variant="outlined" label="First Name" onChange={e=>firstName.current=e.target.value}></TextField>
-          <TextField variant="outlined" label="Last Name" onChange={e=>lastName.current=e.target.value}></TextField>
-          <TextField variant="outlined" label="Birthdate" onChange={e=>birthdate.current=e.target.value}></TextField>
-          <TextField variant="outlined" label="Fiscal Number" onChange={e => {fiscalNumber.current = parseInt(e.target.value, 10);}}></TextField>
-          <TextField variant="outlined" label="Mobile Number" onChange={e=>mobileNumber.current=e.target.value}></TextField>
-          <Button color="primary" variant="contained" onClick={() => dispatch(saveCustomer({firstName: firstName.current, lastName: lastName.current, birthdate:birthdate.current, fiscalNumber: fiscalNumber.current, mobileNumber: mobileNumber.current}))}>Submit</Button>
-        </Stack>
-      </DialogContent>
-    </Dialog>
-  );
-    
+  function handleChange(event) {
+    const {name, value} = event.target
+    setFormData(prevFormData => {
+        return {
+            ...prevFormData,
+            [name]: value
+        }
+    })    
+  }
+
+  function resetFormData(){
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      firstName: "",
+      lastName: "",
+      birthdate: "",
+      fiscalNumber: "",
+      mobileNumber: ""
+    }))
+  }
+
+  function handleClickEdit(firstname: string, lastname: string, birthdate: string, fiscalnumber: string, mobilenumber: string, id: string){
+    setFormData({
+      id: id,
+      firstName: firstname,
+      lastName: lastname,
+      birthdate: birthdate,
+      fiscalNumber: fiscalnumber,
+      mobileNumber: mobilenumber
+    })
+    setEdit(true);
+    setOpen(true);
+  }
+
   const CustomToolbar = () => (
     <>
       <GridToolbar />
       <Button 
-        variant="contained" 
-        style={{ position: 'absolute', top: 10, right: 10 }}
-        onClick={handleClickOpen}
+        variant="contained"
+        color='primary'
+        style={{ position: 'absolute', top: 10, right: 10, color: 'white'}}
+        onClick={handleClickOpenForm}
       >
         Add
       </Button>
@@ -66,7 +116,7 @@ export const Table: React.FC<{rows: any[], columns: GridColDef[]}> = ({rows, col
     return (
       <StyledDataGridContainer>
         <StyledDataGrid
-          rows={rows}
+          rows={customers}
           columns={columns}
           slots={{
             toolbar: CustomToolbar,
@@ -80,7 +130,7 @@ export const Table: React.FC<{rows: any[], columns: GridColDef[]}> = ({rows, col
             }
           }}
         />
-        <FormDialog />
+        <FormDialog edit={edit} open={open} handleClose={handleCloseForm} handleChange={handleChange} formData={formData} />
       </StyledDataGridContainer>
     );
   };
