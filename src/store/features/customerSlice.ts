@@ -1,21 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export interface Customer{
-    id: number;
+    id: string;
     firstName: string;
     lastName: string;
     birthdate: string;
     fiscalNumber: string;
     mobileNumber: string;
-}
-
-
-export interface sendCustomer{
-    firstName: string;
-    lastName: string;
-    birthdate: string;
-    fiscalNumber: string;
-    mobileNumber: string;
+    photo: string
 }
 
 interface CustomerState{
@@ -31,12 +23,18 @@ export const fetchCustomer = createAsyncThunk("customer/fetch", async (thunkAPI)
         method: "GET"
     });
     const data = await response.json();
-    // console.log(data)
     return data;
-
 });
 
-export const saveCustomer = createAsyncThunk("customer/save", async (customer: sendCustomer, thunkAPI)=>{
+// export const fetchPhoto = createAsyncThunk("customer/fetchPhoto", async (id: string, thunkAPI)=>{//unique key e async function
+//     const response = await fetch(`http://localhost:8080/customer/${id}/photo`,{
+//         method: "GET"
+//     });
+//     const data = await response.json();
+//     return data;
+// });
+
+export const saveCustomer = createAsyncThunk("customer/save", async (customer: Customer, thunkAPI)=>{
 
     // const finalCustomer = {
     //     ...customer,
@@ -51,7 +49,6 @@ export const saveCustomer = createAsyncThunk("customer/save", async (customer: s
         },
     });
     const data = await response.json();
-    // console.log(data.body)
     return data;
 });
 
@@ -59,14 +56,14 @@ export const deleteCustomer = createAsyncThunk("customer/delete", async (id: str
     const response = await fetch("http://localhost:8080/customer/" + id,{
         method: "DELETE"
     });
-    const data = await response.json();//VER FORMA MELHOR
-    // console.log(data)
-    return data;
-
+    if (!response.ok) {
+        throw new Error('Deletion failed');
+    }
+    return id;
 });
 
 export const updateCustomer = createAsyncThunk("customer/update", async (customer: Customer, thunkAPI)=>{
-    console.log(customer)
+    // console.log(customer)
     const response = await fetch("http://localhost:8080/customer/" + customer.id,{
         method: "PUT",
         body: JSON.stringify(customer),
@@ -74,10 +71,8 @@ export const updateCustomer = createAsyncThunk("customer/update", async (custome
             "Content-type": "application/json",
         },
     });
-    const data = await response.json();//VER FORMA MELHOR
-    // console.log(data)
+    const data = await response.json();
     return data;
-
 });
 
 export const CustomerSlice = createSlice({
@@ -93,20 +88,33 @@ export const CustomerSlice = createSlice({
     },
     extraReducers(builder) {
         builder.addCase(fetchCustomer.fulfilled, (state, action) => {
-            // console.log(action.payload)
             state.customers = action.payload;
         });
+
+        // builder.addCase(fetchPhoto.fulfilled, (state, action) => {
+        //     state.customers.map(customer => {
+                
+        //         customer.photo = action.payload;
+        //     })
+        //     console.log(state.customers)
+        // });
 
         builder.addCase(saveCustomer.fulfilled, (state, action) => {
             state.customers.push(action.payload);
         });
+        
+        builder.addCase(updateCustomer.fulfilled, (state, action) => {
 
-        // builder.addCase(saveCustomer.rejected, (state, action) => {
-        //     console.log(action.error)
-        // });
+            state.customers = state.customers.map(customer => {
+                if (customer.id === action.payload.id) {
+                    return action.payload;
+                }
+                return customer;
+            });
+        });
 
         builder.addCase(deleteCustomer.fulfilled, (state, action) => {
-            fetchCustomer();
+            state.customers = state.customers.filter(c => c.id !== action.payload);
         });
     },
 });

@@ -8,7 +8,7 @@ import {Scheduling} from './pages/Scheduling/index.tsx'
 import {Header} from './components/Header/index.tsx'
 import StyledBackground from './components/Background/index.tsx'
 import { useAppDispatch } from './store/store.ts';
-import { fetchCustomer } from './store/features/customerSlice.ts';
+import { fetchCustomer} from './store/features/customerSlice.ts';
 
 function App() {
 
