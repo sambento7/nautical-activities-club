@@ -9,6 +9,7 @@ import {Header} from './components/Header/index.tsx'
 import StyledBackground from './components/Background/index.tsx'
 import { useAppDispatch } from './store/store.ts';
 import { fetchCustomer} from './store/features/customerSlice.ts';
+import { fetchActivity } from './store/features/activitySlice.ts';
 
 function App() {
 
@@ -16,6 +17,7 @@ function App() {
   
   useEffect(() => { 
     dispatch(fetchCustomer());
+    dispatch(fetchActivity());
   });
 
   return (

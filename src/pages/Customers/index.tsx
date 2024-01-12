@@ -110,7 +110,7 @@ export const Customers: React.FC = () => {
   return (
     <>
       <Table rows={customers} columns={columns} handleOpenForm={handleOpenForm} />
-      <FormDialog open={open} edit={edit} handleCloseForm={handleCloseForm} formData={formData} title={"Add New Customer"} errorMessage={"Failed to add customer. Please check your input."}>
+      <FormDialog parent={"customer"} open={open} edit={edit} handleCloseForm={handleCloseForm} formData={formData} title={"Add New Customer"} errorMessage={"Failed to add customer. Please check your input."}>
         <TextField id="firstName" name="firstName" variant="outlined" label="First Name" onChange={handleChange} value={formData.firstName}></TextField>
         <TextField id="lastName" name="lastName" variant="outlined" label="Last Name" onChange={handleChange} value={formData.lastName}></TextField>
         <TextField id="birthdate" name="birthdate" variant="outlined" label="Birthdate" onChange={handleChange} value={formData.birthdate}></TextField>

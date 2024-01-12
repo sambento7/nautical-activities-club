@@ -7,8 +7,10 @@ import CloseIcon from "@mui/icons-material/Close"
 import { Alert, IconButton, Snackbar, Stack } from '@mui/material';
 import { useAppDispatch } from '../../store/store.ts'
 import { saveCustomer, updateCustomer } from '../../store/features/customerSlice.ts';
+import { saveActivity } from '../../store/features/activitySlice.ts';
+import { saveSchedule } from '../../store/features/schedulingSlice.ts';
 
-export const FormDialog = ({ open, edit, handleCloseForm, formData, title, errorMessage, children}) => {
+export const FormDialog = ({parent, open, edit, handleCloseForm, formData, title, errorMessage, children}) => {
     
     const dispatch = useAppDispatch();
 
@@ -18,6 +20,8 @@ export const FormDialog = ({ open, edit, handleCloseForm, formData, title, error
         setError(false);
     };
     const handleSubmit = () => {
+        parent !=="schedule" ?
+        parent==="customer" ?
         !edit ? 
         dispatch(saveCustomer(formData))
         .unwrap()
@@ -35,6 +39,17 @@ export const FormDialog = ({ open, edit, handleCloseForm, formData, title, error
         .catch(() => {
             setError(true);
         })
+        :
+        dispatch(saveActivity(formData))
+        .unwrap()
+        .then(() => {
+            handleCloseForm();
+        })
+        .catch(() => {
+            setError(true);
+        })
+        :
+        dispatch(saveSchedule({...formData, customer: {id: formData.customer}, activity: {id: formData.activity}, date: formData.date.format('YYYY-MM-DD')}))
     };
 
     return (
