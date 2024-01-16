@@ -10,6 +10,7 @@ import StyledBackground from './components/Background/index.tsx'
 import { useAppDispatch } from './store/store.ts';
 import { fetchCustomer} from './store/features/customerSlice.ts';
 import { fetchActivity } from './store/features/activitySlice.ts';
+import { fetchSchedule } from './store/features/schedulingSlice.ts';
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
   useEffect(() => { 
     dispatch(fetchCustomer());
     dispatch(fetchActivity());
+    dispatch(fetchSchedule())
   });
 
   return (

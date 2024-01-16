@@ -8,7 +8,7 @@ import { Alert, IconButton, Snackbar, Stack } from '@mui/material';
 import { useAppDispatch } from '../../store/store.ts'
 import { saveCustomer, updateCustomer } from '../../store/features/customerSlice.ts';
 import { saveActivity } from '../../store/features/activitySlice.ts';
-import { saveSchedule } from '../../store/features/schedulingSlice.ts';
+import { addCustomer, saveSchedule } from '../../store/features/schedulingSlice.ts';
 
 export const FormDialog = ({parent, open, edit, handleCloseForm, formData, title, errorMessage, children}) => {
     
@@ -50,6 +50,17 @@ export const FormDialog = ({parent, open, edit, handleCloseForm, formData, title
         })
         :
         dispatch(saveSchedule({...formData, customer: {id: formData.customer}, activity: {id: formData.activity}, date: formData.date.format('YYYY-MM-DD')}))
+        .unwrap()
+        .then((data) => {
+            dispatch(addCustomer({schedulingId: data.id, userId: formData.customer}))
+            .unwrap()
+            .then(() => {     
+                handleCloseForm();
+            })
+            .catch(() => {
+                setError(true);
+            })
+        })
     };
 
     return (

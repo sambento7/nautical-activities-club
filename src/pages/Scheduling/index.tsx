@@ -5,21 +5,23 @@ import { Table } from '../../components/Table/index.tsx';
 import { useAppSelector } from '../../store/store.ts'
 import { useState } from 'react';
 import { useAppDispatch } from '../../store/store.ts'
-// import { deleteSchedule } from '../../store/features/scheduleSlice.ts';
 import { FormDialog } from '../../components/FormDialog/index.tsx';
-import { TextField, Avatar } from '@mui/material';
+import { TextField} from '@mui/material';
 
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel'
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
+// import { SelectChangeEvent } from '@mui/material/Select';
 
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import dayjs, { Dayjs } from 'dayjs';
+// import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import dayjs from 'dayjs';
+// import { Dayjs } from 'dayjs';
+import { deleteSchedule } from '../../store/features/schedulingSlice.ts';
 
 export const Scheduling: React.FC = () => {
 
@@ -42,17 +44,12 @@ export const Scheduling: React.FC = () => {
     resetFormData();
   };
 
-  function handleClickEdit(params){
-    defineFormData(params);
-    setEdit(true);
+  function handleClickDelete(id:string){
+    dispatch(deleteSchedule(id));
+    // .unwrap().catch((e) => {
+    //   console.log("Failed to delete schedule")
+    // });
   }
-
-  // function handleClickDelete(id:string){
-  //   dispatch(deleteCustomer(id));
-  //   // .unwrap().catch((e) => {
-  //   //   console.log("Failed to delete schedule")
-  //   // });
-  // }
 
   function resetFormData(){
     setFormData(prevFormData => ({
@@ -65,17 +62,6 @@ export const Scheduling: React.FC = () => {
     }))
   }
 
-  function defineFormData(params){
-    setFormData({
-      id: params.id,
-      customer: params.customer,
-      activity: params.activity,
-      description: params.description,
-      date: params.date,
-      // hour: params.hour
-    })
-  }
-
   function handleChange(event) {
     const {name, value} = event.target
     setFormData(prevFormData => {
@@ -85,7 +71,8 @@ export const Scheduling: React.FC = () => {
         }
     })    
   }
-  // const schedules = useAppSelector((state) => state.schedule.schedules);
+  
+  // console.log(schedules)
   
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 160 },
@@ -100,22 +87,24 @@ export const Scheduling: React.FC = () => {
       width: 200,
       renderCell: (params) => {
         return (<>
-          <GridActionsCellItem icon={<Delete color={'error'} />} label="Delete" />
+          <GridActionsCellItem icon={<Delete color={'error'} />} onClick={() => handleClickDelete(params.row.id)}  label="Delete" />
         </>)
       },
       filterable: false
     }
   ];
 
-  // onClick={() => handleClickDelete(params.row.id)} 
-
   const customers = useAppSelector((state) => state.customer.customers);
   const activities = useAppSelector((state) => state.activity.activities);
+  const schedules = useAppSelector((state) => state.scheduling.schedules);
+  const finalSchedules = schedules.map(schedule => {
+    return {...schedule, customer : schedule.customer.id, activity : schedule.activity.id}
+  })
 
   return (
     <>
-      <Table rows={[]} columns={columns} handleOpenForm={handleOpenForm} />
-      <FormDialog parent={"schedule"} open={open} edit={edit} handleCloseForm={handleCloseForm} formData={formData} title={"Add New Customer"} errorMessage={"Failed to add schedule. Please check your input."}>
+      <Table rows={finalSchedules} columns={columns} handleOpenForm={handleOpenForm} />
+      <FormDialog parent={"schedule"} open={open} edit={edit} handleCloseForm={handleCloseForm} formData={formData} title={"Add New Schedule"} errorMessage={"Failed to add schedule. Please check your input."}>
         <FormControl>
             <InputLabel id="select-customer">Customer</InputLabel>
             <Select

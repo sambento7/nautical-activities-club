@@ -114,7 +114,9 @@ export const CustomerSlice = createSlice({
         });
 
         builder.addCase(deleteCustomer.fulfilled, (state, action) => {
+            // console.log(state.schedules)
             state.customers = state.customers.filter(c => c.id !== action.payload);
+            
         });
     },
 });

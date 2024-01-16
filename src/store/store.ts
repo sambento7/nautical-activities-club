@@ -12,5 +12,6 @@ export const store=configureStore({
     }
 })
 
-export const useAppDispatch : () => typeof store.dispatch = useDispatch;
-export const useAppSelector: TypedUseSelectorHook<ReturnType<typeof store.getState>> = useSelector;
+export const useAppDispatch : () => typeof store.dispatch = useDispatch; //create a typed version of useDispatch specific to my application's Redux store
+                                                                         //important to give error messages when dispatching actions that are not defined in the store or when passing the wrong arguments to the action creators
+export const useAppSelector: TypedUseSelectorHook<ReturnType<typeof store.getState>> = useSelector;//create a typed version of useSelector specific to my application's Redux store
