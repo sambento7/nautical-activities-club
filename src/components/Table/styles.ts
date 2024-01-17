@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { DataGrid } from '@mui/x-data-grid';
+import Button from '@mui/material/Button';
 
 export const StyledDataGrid = styled(DataGrid)`
     & .MuiDataGrid-columnHeaders {
@@ -25,6 +26,12 @@ export const StyledDataGridContainer = styled.div`
     border-radius: 50%;
 `;
 
+// export const StyledButton = styled(Button)`
+//   && {position: 'absolute'; 
+//   top: 10; 
+//   right: 10; 
+//   color: 'white';}
+// `;
 
 
 

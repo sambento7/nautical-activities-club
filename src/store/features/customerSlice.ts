@@ -10,6 +10,11 @@ export interface Customer{
     photo: string
 }
 
+interface CustomerPhotoInfo{
+    id: string;
+    photo: File;
+}
+
 interface CustomerState{
     customers: Customer[];
 }
@@ -26,13 +31,31 @@ export const fetchCustomer = createAsyncThunk("customer/fetch", async (thunkAPI)
     return data;
 });
 
-// export const fetchPhoto = createAsyncThunk("customer/fetchPhoto", async (id: string, thunkAPI)=>{//unique key e async function
-//     const response = await fetch(`http://localhost:8080/customer/${id}/photo`,{
-//         method: "GET"
-//     });
-//     const data = await response.json();
-//     return data;
-// });
+export const savePhoto = createAsyncThunk("customer/savePhoto", async (photoInfo: CustomerPhotoInfo, thunkAPI)=>{
+
+    const formData = new FormData();
+    formData.append("photofile", photoInfo.photo as File);
+    const response = await fetch(`http://localhost:8080/customer/${photoInfo.id}/photo`,{
+        method: "POST",
+        body: formData ,
+        // headers: {
+        //     // "Content-type": "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
+        // },
+    });
+    const data = await response.json();
+    // console.log(data)
+    return data;
+});
+
+export const fetchPhoto = createAsyncThunk("customer/fetchPhoto", async (id: string, thunkAPI)=>{
+    const response = await fetch(`http://localhost:8080/customer/${id}/photo`,{
+        method: "GET"
+    });
+    const data = await response.blob();
+    const imageObjectURL = URL.createObjectURL(data);
+    return {imageObjectURL, id};
+});
+
 
 export const saveCustomer = createAsyncThunk("customer/save", async (customer: Customer, thunkAPI)=>{
 
@@ -40,7 +63,6 @@ export const saveCustomer = createAsyncThunk("customer/save", async (customer: C
     //     ...customer,
     //     fiscalNumber: parseInt(customer.fiscalNumber, 10)
     // }
-
     const response = await fetch("http://localhost:8080/customer",{
         method: "POST",
         body: JSON.stringify(customer),
@@ -63,7 +85,6 @@ export const deleteCustomer = createAsyncThunk("customer/delete", async (id: str
 });
 
 export const updateCustomer = createAsyncThunk("customer/update", async (customer: Customer, thunkAPI)=>{
-    // console.log(customer)
     const response = await fetch("http://localhost:8080/customer/" + customer.id,{
         method: "PUT",
         body: JSON.stringify(customer),
@@ -87,17 +108,19 @@ export const CustomerSlice = createSlice({
         // },
     },
     extraReducers(builder) {
+        
+        
+
         builder.addCase(fetchCustomer.fulfilled, (state, action) => {
             state.customers = action.payload;
         });
 
-        // builder.addCase(fetchPhoto.fulfilled, (state, action) => {
-        //     state.customers.map(customer => {
-                
-        //         customer.photo = action.payload;
-        //     })
-        //     console.log(state.customers)
-        // });
+        builder.addCase(fetchPhoto.fulfilled, (state, action) => {
+            state.customers.map(customer => {
+                if (customer.id === action.payload.id) customer.photo = action.payload.imageObjectURL;
+                return customer;
+            })
+        });
 
         builder.addCase(saveCustomer.fulfilled, (state, action) => {
             state.customers.push(action.payload);
@@ -114,10 +137,11 @@ export const CustomerSlice = createSlice({
         });
 
         builder.addCase(deleteCustomer.fulfilled, (state, action) => {
-            // console.log(state.schedules)
             state.customers = state.customers.filter(c => c.id !== action.payload);
             
         });
+
+
     },
 });
 

@@ -13,7 +13,7 @@ const customers = useAppSelector((state) => state.customer.customers);
 const schedules = useAppSelector((state) => state.scheduling.schedules);
 
 
-const enrichedSchedules = schedules.map(schedule => {
+const namedSchedules = schedules.map(schedule => {
     const customer = customers.find(c => c.id === schedule.customer.id);
     const fullName = customer ? `${customer.firstName} ${customer.lastName}` : 'Unknown';
     return {
@@ -26,7 +26,7 @@ const enrichedSchedules = schedules.map(schedule => {
     <StyledGrid container spacing={2} >
         <Grid item xs={12}>
             <CustomTitle>Schedules</CustomTitle>
-            {enrichedSchedules.map((item) => (
+            {namedSchedules.map((item) => (
                 <StyledCardItem key={item.id} sx={{ marginBottom: 2 }}>
                     <CardContent>
                         <CustomSubTitle>{item.name}</CustomSubTitle>

@@ -7,8 +7,8 @@ import {Activities} from './pages/Activities/index.tsx'
 import {Scheduling} from './pages/Scheduling/index.tsx'
 import {Header} from './components/Header/index.tsx'
 import StyledBackground from './components/Background/index.tsx'
-import { useAppDispatch } from './store/store.ts';
-import { fetchCustomer} from './store/features/customerSlice.ts';
+import { useAppDispatch} from './store/store.ts';
+import { fetchCustomer, fetchPhoto} from './store/features/customerSlice.ts';
 import { fetchActivity } from './store/features/activitySlice.ts';
 import { fetchSchedule } from './store/features/schedulingSlice.ts';
 
@@ -17,11 +17,14 @@ function App() {
   const dispatch = useAppDispatch();
   
   useEffect(() => { 
-    dispatch(fetchCustomer());
+    const customers = dispatch(fetchCustomer());
+    customers.unwrap().then((data) => {
+      data.map((customer) => dispatch(fetchPhoto(customer.id)));
+    })
     dispatch(fetchActivity());
-    dispatch(fetchSchedule())
+    dispatch(fetchSchedule());
   });
-
+  
   return (
     <>
       <StyledBackground>

@@ -8,6 +8,13 @@ export const Table = ({rows, columns, handleOpenForm}) => {
   const CustomToolbar = () => (
     <>
       <GridToolbar />
+      {/* <StyledButton 
+        variant="contained"
+        color='primary'
+        onClick={handleOpenForm}
+      >
+        Add
+      </StyledButton> */}
       <Button 
         variant="contained"
         color='primary'
@@ -20,25 +27,23 @@ export const Table = ({rows, columns, handleOpenForm}) => {
   );
 
     return (
-      <>
-        <StyledDataGridContainer>
-          <StyledDataGrid
-            rows={rows}
-            columns={columns}
-            slots={{
-              toolbar: CustomToolbar,
-            }}
-            pageSizeOptions={[5, 10]}
-            checkboxSelection
-            disableRowSelectionOnClick
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 5 },
-              }
-            }}
-          />
-        </StyledDataGridContainer>
-        {/* <FormDialog open={open} edit={edit} handleCloseForm={handleCloseForm} handleChange={handleChange} formData={formData} /> */}
-      </>
+      <StyledDataGridContainer>
+        <StyledDataGrid
+          rows={rows}
+          columns={columns}
+          slots={{
+            toolbar: CustomToolbar,
+          }}
+          pageSizeOptions={[5, 10]}
+          checkboxSelection
+          disableRowSelectionOnClick
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 5 },
+            }
+          }}
+        />
+      </StyledDataGridContainer>
+
     );
   };

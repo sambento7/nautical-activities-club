@@ -3,11 +3,12 @@ import { GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 import { Edit, Delete } from '@mui/icons-material';
 import { Table } from '../../components/Table/index.tsx';
 import { useAppSelector } from '../../store/store.ts'
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAppDispatch } from '../../store/store.ts'
-import { deleteCustomer } from '../../store/features/customerSlice.ts';
+import { deleteCustomer, fetchPhoto, savePhoto } from '../../store/features/customerSlice.ts';
 import { FormDialog } from '../../components/FormDialog/index.tsx';
 import { TextField, Avatar } from '@mui/material';
+import { Button } from '@mui/base';
 
 export const Customers: React.FC = () => {
 
@@ -36,9 +37,6 @@ export const Customers: React.FC = () => {
 
   function handleClickDelete(id:string){
     dispatch(deleteCustomer(id));
-    // .unwrap().catch((e) => {
-    //   console.log("Failed to delete customer")
-    // });
   }
 
   function resetFormData(){
@@ -74,6 +72,30 @@ export const Customers: React.FC = () => {
   }
   const customers = useAppSelector((state) => state.customer.customers);
 
+  const inputFile = useRef<HTMLInputElement | null>(null);
+  
+  const handleFileUpload = (id:string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length) {
+      dispatch(savePhoto({photo: files[0], id: id}))
+      .unwrap()
+      .then(() => {
+        dispatch(fetchPhoto(id))
+      })
+    }
+  };
+
+  const onButtonClick = () => {
+    inputFile.current?.click();
+  };
+
+  // React.useEffect(() => {
+  //   if (image) {  
+  //     dispatch(savePhoto(image));
+  //   }
+  // }, [image]);
+
+
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 160 },
     { field: 'firstName', headerName: 'First name', width: 200, filterable: true },
@@ -86,7 +108,21 @@ export const Customers: React.FC = () => {
       headerName: 'Photo',
       width: 160,
       renderCell: (params) => {
-        return <Avatar alt={params.row.firstName} src={params.row.photo} />
+        return (
+          <>
+            <Avatar alt={params.row.firstName} src={params.row.photo}>
+              <input
+                style={{ display: "none" }}
+                ref={inputFile}
+                onChange={(event) => handleFileUpload(params.row.id, event)}
+                type="file"
+              />
+              <Button onClick={onButtonClick}>
+                Ola
+              </Button>
+            </Avatar>
+          </>
+        )
     },
       filterable: false
     },
