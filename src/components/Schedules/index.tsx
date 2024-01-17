@@ -2,8 +2,9 @@ import React from 'react';
 import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';
 
-import {StyledButton, StyledCardItem, StyledGrid, CustomSubTitle, CustomText, CustomTitle, Identifier, InfoLine} from './styles.ts';
+import {StyledButton, StyledCardItem, StyledGrid, CustomSubTitle, CustomText, CustomTitle, Identifier, InfoLine, EmptyLine} from './styles.ts';
 import { Link } from 'react-router-dom';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 
 import { useAppSelector } from '../../store/store.ts'
 
@@ -26,7 +27,7 @@ const namedSchedules = schedules.map(schedule => {
     <StyledGrid container spacing={2} >
         <Grid item xs={12}>
             <CustomTitle>Schedules</CustomTitle>
-            {namedSchedules.map((item) => (
+            {namedSchedules.length > 0 ? namedSchedules.map((item) => (
                 <StyledCardItem key={item.id} sx={{ marginBottom: 2 }}>
                     <CardContent>
                         <CustomSubTitle>{item.name}</CustomSubTitle>
@@ -40,7 +41,12 @@ const namedSchedules = schedules.map(schedule => {
                         </InfoLine>
                     </CardContent>
                 </StyledCardItem>
-        ))}
+        )) : 
+        <EmptyLine>
+            <HourglassEmptyIcon/>
+            <CustomSubTitle>No schedules</CustomSubTitle>
+        </EmptyLine>
+        }
                 <Link to="/scheduling"><StyledButton variant="contained">See all</StyledButton></Link>
         </Grid>
     </StyledGrid>

@@ -117,8 +117,8 @@ export const Customers: React.FC = () => {
                 onChange={(event) => handleFileUpload(params.row.id, event)}
                 type="file"
               />
-              <Button onClick={onButtonClick}>
-                Ola
+              <Button onClick={onButtonClick} style={{border: 'none', background: 'none', color: 'white', fontSize: '1.5em'}}>
+                +
               </Button>
             </Avatar>
           </>
