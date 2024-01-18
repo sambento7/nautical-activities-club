@@ -1,38 +1,58 @@
-import * as React from 'react';
+import React, { useState } from 'react';
+
+import { useAppSelector, useAppDispatch } from '../../store/store.ts'
+import { addCustomer, deleteSchedule, saveSchedule } from '../../store/features/schedulingSlice.ts';
+
+import {Loading} from '../Loading/index.tsx';
+import { Table } from '../../components/Table/index.tsx';
+import { FormDialog } from '../../components/FormDialog/index.tsx';
+
 import { GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 import { Delete } from '@mui/icons-material';
-import { Table } from '../../components/Table/index.tsx';
-import { useAppSelector } from '../../store/store.ts'
-import { useState } from 'react';
-import { useAppDispatch } from '../../store/store.ts'
-import { FormDialog } from '../../components/FormDialog/index.tsx';
 import { TextField} from '@mui/material';
-
 import MenuItem from '@mui/material/MenuItem';
 import InputLabel from '@mui/material/InputLabel'
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-// import { SelectChangeEvent } from '@mui/material/Select';
-
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-// import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs from 'dayjs';
-// import { Dayjs } from 'dayjs';
-import { deleteSchedule } from '../../store/features/schedulingSlice.ts';
+
 
 export const Scheduling: React.FC = () => {
 
   const dispatch = useAppDispatch();
 
-  const [formData, setFormData] = useState({id: "", customer: "", activity: "", description: "", date: dayjs()});
-  // , hour: dayjs()
+  const customers = useAppSelector((state) => state.customer.customers);
+  const activities = useAppSelector((state) => state.activity.activities);
+  const schedules = useAppSelector((state) => state.scheduling.schedules);
+  const finalSchedules = schedules.map(schedule => {
+    return {...schedule, customer : schedule.customer.id, activity : schedule.activity.id}
+  })
+  const loading = useAppSelector((state) => state.scheduling.loading);
 
+  const [formData, setFormData] = useState({
+    id: "", 
+    customer: "", 
+    activity: "", 
+    description: "", 
+    date: dayjs()
+  });
   const [open, setOpen] = useState(false);
-
   const [edit, setEdit] = useState(false);
+  const [error, setError] = useState(false);
+
+  function resetFormData(){
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      customer: "",
+      activity: "",
+      description: "",
+      date: dayjs(),
+    }))
+  }
 
   const handleOpenForm = () => {
     setOpen(true);
@@ -46,20 +66,6 @@ export const Scheduling: React.FC = () => {
 
   function handleClickDelete(id:string){
     dispatch(deleteSchedule(id));
-    // .unwrap().catch((e) => {
-    //   console.log("Failed to delete schedule")
-    // });
-  }
-
-  function resetFormData(){
-    setFormData(prevFormData => ({
-      ...prevFormData,
-      customer: "",
-      activity: "",
-      description: "",
-      date: dayjs(),
-      // hour: dayjs()
-    }))
   }
 
   function handleChange(event) {
@@ -71,8 +77,30 @@ export const Scheduling: React.FC = () => {
         }
     })    
   }
+
+
+  const handleCloseAlert = (event: React.SyntheticEvent | Event, reason?: string) => {    
+      setError(false);
+  };
+
+  const handleSubmit = () => {
+    dispatch(saveSchedule({...formData, customer: {id: formData.customer}, activity: {id: formData.activity}, date: formData.date.format('YYYY-MM-DD')}))
+    .unwrap()
+    .then((data) => {
+        dispatch(addCustomer({schedulingId: data.id, userId: formData.customer}))
+        .unwrap()
+        .then(() => {     
+            handleCloseForm();
+        })
+        .catch(() => {
+            setError(true);
+        })
+    })
+    .catch(() => {
+      setError(true);
+  })
+};
   
-  // console.log(schedules)
   
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 160 },
@@ -80,7 +108,6 @@ export const Scheduling: React.FC = () => {
     { field: 'activity', headerName: 'Activity', width: 200, filterable: true },
     { field: 'description', headerName: 'Description', width: 200, filterable: true },
     { field: 'date', headerName: 'Date', width: 200, filterable: true },
-    // { field: 'hour', headerName: 'Hour', width: 200, filterable: true },
     {
       field: 'actions',
       headerName: 'Action',
@@ -94,17 +121,11 @@ export const Scheduling: React.FC = () => {
     }
   ];
 
-  const customers = useAppSelector((state) => state.customer.customers);
-  const activities = useAppSelector((state) => state.activity.activities);
-  const schedules = useAppSelector((state) => state.scheduling.schedules);
-  const finalSchedules = schedules.map(schedule => {
-    return {...schedule, customer : schedule.customer.id, activity : schedule.activity.id}
-  })
-
   return (
+    loading ? <Loading /> :
     <>
       <Table rows={finalSchedules} columns={columns} handleOpenForm={handleOpenForm} />
-      <FormDialog parent={"schedule"} open={open} edit={edit} handleCloseForm={handleCloseForm} formData={formData} title={"Add New Schedule"} errorMessage={"Failed to add schedule. Please check your input."}>
+      <FormDialog open={open} edit={edit} handleCloseForm={handleCloseForm} error={error} handleCloseAlert={handleCloseAlert} handleSubmit={handleSubmit} title={"Add New Schedule"} errorMessage={"Failed to add schedule. Please check your input."}>
         <FormControl>
             <InputLabel id="select-customer">Customer</InputLabel>
             <Select
@@ -126,7 +147,7 @@ export const Scheduling: React.FC = () => {
               onChange={handleChange}
               name={"activity"}
             >
-              {activities.map((activity) => (//ver "key"
+              {activities.map((activity) => (
                 <MenuItem key={activity.id} value={activity.id}>{activity.name}</MenuItem>
               ))}
             </Select>
@@ -139,11 +160,6 @@ export const Scheduling: React.FC = () => {
               date: newValue || dayjs()
             })
             } name={"date"}/>
-            {/* <TimePicker label="Hour" value={formData.hour} onChange={(newValue) => setFormData({
-              ...formData,
-              hour: newValue || dayjs()
-            })
-            } name={"hour"}/> */}
           </DemoContainer>
         </LocalizationProvider>
       </FormDialog>

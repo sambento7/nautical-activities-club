@@ -1,43 +1,34 @@
-import * as React from 'react';
+import React, { useState, useRef } from 'react';
+
+import { useAppSelector, useAppDispatch } from '../../store/store.ts'
+import { deleteCustomer, fetchPhoto, saveCustomer, savePhoto, updateCustomer } from '../../store/features/customerSlice.ts';
+
+import { Table } from '../../components/Table/index.tsx';
+import {Loading} from '../Loading/index.tsx';
+import { FormDialog } from '../../components/FormDialog/index.tsx';
+
 import { GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 import { Edit, Delete } from '@mui/icons-material';
-import { Table } from '../../components/Table/index.tsx';
-import { useAppSelector } from '../../store/store.ts'
-import { useState, useRef } from 'react';
-import { useAppDispatch } from '../../store/store.ts'
-import { deleteCustomer, fetchPhoto, savePhoto } from '../../store/features/customerSlice.ts';
-import { FormDialog } from '../../components/FormDialog/index.tsx';
 import { TextField, Avatar } from '@mui/material';
 import { Button } from '@mui/base';
 
 export const Customers: React.FC = () => {
 
   const dispatch = useAppDispatch();
+  const customers = useAppSelector((state) => state.customer.customers);
+  const loading = useAppSelector((state) => state.customer.loading);
 
-  const [formData, setFormData] = useState({id: "", firstName: "", lastName: "", birthdate: "", fiscalNumber: "", mobileNumber: ""});
-
+  const [formData, setFormData] = useState({
+    id: "", 
+    firstName: "", 
+    lastName: "",
+    birthdate: "", 
+    fiscalNumber: "", 
+    mobileNumber: ""
+  });
   const [open, setOpen] = useState(false);
-
   const [edit, setEdit] = useState(false);
-
-  const handleOpenForm = () => {
-    setOpen(true);
-  };
-
-  const handleCloseForm = () => {
-    setOpen(false);
-    setEdit(false);
-    resetFormData();
-  };
-
-  function handleClickEdit(params){
-    defineFormData(params);
-    setEdit(true);
-  }
-
-  function handleClickDelete(id:string){
-    dispatch(deleteCustomer(id));
-  }
+  const [error, setError] = useState(false);
 
   function resetFormData(){
     setFormData(prevFormData => ({
@@ -61,6 +52,25 @@ export const Customers: React.FC = () => {
     })
   }
 
+  const handleOpenForm = () => {
+    setOpen(true);
+  };
+
+  const handleCloseForm = () => {
+    setOpen(false);
+    setEdit(false);
+    resetFormData();
+  };
+
+  function handleClickEdit(params){
+    defineFormData(params);
+    setEdit(true);
+  }
+
+  function handleClickDelete(id:string){
+    dispatch(deleteCustomer(id));
+  }
+
   function handleChange(event) {
     const {name, value} = event.target
     setFormData(prevFormData => {
@@ -70,8 +80,32 @@ export const Customers: React.FC = () => {
         }
     })    
   }
-  const customers = useAppSelector((state) => state.customer.customers);
 
+  const handleCloseAlert = (event: React.SyntheticEvent | Event, reason?: string) => {    
+      setError(false);
+  };
+
+  const handleSubmit = () => {
+    !edit ? 
+    dispatch(saveCustomer(formData))
+    .unwrap()
+    .then(() => {
+        handleCloseForm();
+    })
+    .catch(() => {
+        setError(true);
+    }) :
+    dispatch(updateCustomer(formData))
+    .unwrap()
+    .then(() => {
+        handleCloseForm();
+    })
+    .catch(() => {
+        setError(true);
+    })
+};
+
+  //Para dar upload à foto:
   const inputFile = useRef<HTMLInputElement | null>(null);
   
   const handleFileUpload = (id:string, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,13 +122,6 @@ export const Customers: React.FC = () => {
   const onButtonClick = () => {
     inputFile.current?.click();
   };
-
-  // React.useEffect(() => {
-  //   if (image) {  
-  //     dispatch(savePhoto(image));
-  //   }
-  // }, [image]);
-
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 160 },
@@ -144,9 +171,10 @@ export const Customers: React.FC = () => {
   ];
 
   return (
+    loading ? <Loading/> : 
     <>
       <Table rows={customers} columns={columns} handleOpenForm={handleOpenForm} />
-      <FormDialog parent={"customer"} open={open} edit={edit} handleCloseForm={handleCloseForm} formData={formData} title={"Add New Customer"} errorMessage={"Failed to add customer. Please check your input."}>
+      <FormDialog open={open} edit={edit} handleCloseForm={handleCloseForm} error={error} handleCloseAlert={handleCloseAlert} handleSubmit={handleSubmit} title={"Add New Customer"} errorMessage={"Failed to add customer. Please check your input."}>
         <TextField id="firstName" name="firstName" variant="outlined" label="First Name" onChange={handleChange} value={formData.firstName}></TextField>
         <TextField id="lastName" name="lastName" variant="outlined" label="Last Name" onChange={handleChange} value={formData.lastName}></TextField>
         <TextField id="birthdate" name="birthdate" variant="outlined" label="Birthdate" onChange={handleChange} value={formData.birthdate}></TextField>

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import {GridToolbar} from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import {StyledDataGridContainer, StyledDataGrid} from './styles.ts'
