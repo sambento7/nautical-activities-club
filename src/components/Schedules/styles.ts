@@ -7,6 +7,7 @@ export const StyledGrid = styled(Grid)`
   background: #ECECEC;
   padding: 20px;
   border-radius: 20px; 
+  margin-bottom: 35px;
 `;
 
 export const StyledCardItem = styled(Card)` //uso && para garantir que este estilo tem precedência sobre outros estilos
