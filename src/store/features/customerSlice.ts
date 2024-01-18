@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { deleteScheduleCustomer } from "./schedulingSlice.ts";
 
 export interface Customer{
     id: string;
@@ -73,7 +74,6 @@ export const saveCustomer = createAsyncThunk("customer/save", async (customer: C
     const data = await response.json();
     return data;
 });
-
 export const deleteCustomer = createAsyncThunk("customer/delete", async (id: string, thunkAPI)=>{
     const response = await fetch("http://localhost:8080/customer/" + id,{
         method: "DELETE"
@@ -81,6 +81,7 @@ export const deleteCustomer = createAsyncThunk("customer/delete", async (id: str
     if (!response.ok) {
         throw new Error('Deletion failed');
     }
+    else thunkAPI.dispatch(deleteScheduleCustomer(id))
     return id;
 });
 
@@ -100,12 +101,6 @@ export const CustomerSlice = createSlice({
     name: "customer",
     initialState,
     reducers:{
-        // addPerson: (state, action: PayloadAction<{name: string}>) => {
-        //     state.persons.push({
-        //         id: state.persons.length,
-        //         name: action.payload.name,
-        //     });
-        // },
     },
     extraReducers(builder) {
         

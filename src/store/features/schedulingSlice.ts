@@ -60,6 +60,13 @@ export const addCustomer = createAsyncThunk("scheduling/addCustomer", async (Ids
     return data;
 });
 
+// export const deleteCustomer = (id: string) => {
+//     return {
+//         type: "DELETE_CUSTOMER",
+//         payload: id
+//     }
+// }
+
 export const deleteSchedule = createAsyncThunk("scheduling/delete", async (id: string, thunkAPI)=>{
     const response = await fetch("http://localhost:8080/scheduling/" + id,{
         method: "DELETE"
@@ -74,6 +81,14 @@ export const SchedulingSlice = createSlice({
     name: "scheduling",
     initialState,
     reducers:{
+        deleteScheduleCustomer: (state, action) => {
+            state.schedules = state.schedules.map(schedule => {
+                if(schedule.customer.id === action.payload){
+                    return {...schedule, customer: {id: "Deleted"}};
+                }
+                return schedule;
+            })
+        }
     },
     extraReducers(builder) {
         builder.addCase(fetchSchedule.fulfilled, (state, action) => {
@@ -97,22 +112,8 @@ export const SchedulingSlice = createSlice({
         builder.addCase(deleteSchedule.fulfilled, (state, action) => {
             state.schedules = state.schedules.filter(c => c.id !== action.payload);
         });
-
-        // builder.addCase(deleteCustomer.fulfilled, (state, action) => {
-        //     // console.log(state.schedules)
-        //     state.schedules = state.schedules.map(schedule => {
-        //         console.log(schedule.customer.id)
-        //         console.log(action.payload) 
-        //         if(schedule.customer.id === action.payload){
-        //             console.log("AQUIIII")
-        //             return {...schedule, customer: {id: "Deleted"}};
-        //         }
-        //         return schedule;
-        //     })
-        //     // console.log(state.schedules)
-        // });
     },
 });
 
 export default SchedulingSlice.reducer;
-// export const { addPerson } = PersonSlice.actions;
+export const { deleteScheduleCustomer } = SchedulingSlice.actions;

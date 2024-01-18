@@ -13,7 +13,6 @@ export function Schedules() {
 const customers = useAppSelector((state) => state.customer.customers);
 const schedules = useAppSelector((state) => state.scheduling.schedules);
 
-
 const namedSchedules = schedules.map(schedule => {
     const customer = customers.find(c => c.id === schedule.customer.id);
     const fullName = customer ? `${customer.firstName} ${customer.lastName}` : 'Unknown';
