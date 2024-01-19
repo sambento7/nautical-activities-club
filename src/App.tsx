@@ -21,9 +21,12 @@ function App() {
   
   useEffect(() => { 
     const customers = dispatch(fetchCustomer());
+
     customers.unwrap().then((data) => {
-      data.map((customer) => dispatch(fetchPhoto(customer.id)));
+      if(data.length!== 0) data.map((customer) => dispatch(fetchPhoto(customer.id)));
     })
+    .catch((error) => console.log(error));
+    
     dispatch(fetchActivity());
     dispatch(fetchSchedule());
   });

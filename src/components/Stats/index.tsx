@@ -6,6 +6,8 @@ export const Stats = () => {
     const activities = useAppSelector((state) => state.activity.activities);
     const schedules = useAppSelector((state) => state.scheduling.schedules);
 
+    if(schedules.length === 0) return (<></>);
+
     const activityCounts = {};
     const totalActivityCount = schedules.length;
 
@@ -17,6 +19,7 @@ export const Stats = () => {
             activityCounts[activityId] = 1;
         }
     });
+    
 
     const activityPercentages = activities.map(activity => {
         const count = activityCounts[activity.id] || 0;
